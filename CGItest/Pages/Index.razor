@@ -1,0 +1,52 @@
+﻿@page "/Index"
+@inject HomeService service;
+
+
+<PageTitle>Index</PageTitle>
+@if (service == null)
+{
+    <p>DEN ÄR NULL TAMEFAN!</p>
+}
+<h4>
+    Ordrar
+</h4>
+@foreach (var order in _orders)
+{
+<thead>
+    <tr>
+        <th>Id</th>
+        <th>Namn</th>
+    </tr>
+</thead>
+    <ul>
+        @order.Id
+        @order.Name
+    </ul>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Artikelnamn</th>
+            <th>Styckpris</th>
+            <th>Kvantitet</th>
+            <th>Summa</th>
+        </tr>
+    </thead>
+    foreach (var row in order.OrderRows)
+    {
+        <ul>
+            #@row.RowNumber
+            @row.Article.Name
+            @row.Article.Price
+            @row.Quantity
+            @row.Sum
+        </ul>
+    }
+}
+@code
+{
+    List<Order> _orders = new();
+    protected override async Task OnInitializedAsync()
+    {
+        _orders = service.GetOrders();
+    }
+}

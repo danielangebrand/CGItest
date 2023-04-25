@@ -1,0 +1,73 @@
+﻿@using CGItest.Data.Factories;
+@using CGItest.Models;
+@using CGItest.Services;
+@using Microsoft.AspNetCore.Components.Forms;
+@page "/OrderCreation";
+@inject HomeService service;
+
+<h3>Skapa din order</h3>
+
+<EditForm Model="@order" OnValidSubmit="CreateOrder">
+    <p>
+        <label>
+            Ange ditt namn:
+            <InputText id="Name" class="form-control" @bind-Value="order.Name" />
+        </label>
+    </p>
+    <thead>
+        <tr>
+            <th>Artikel</th>
+            <th>Kvantiet</th>
+        </tr>
+    </thead>
+
+    <InputSelect @bind-Value="@chosenArticleId">
+        <option value="">Välj en artikel..</option>
+        @foreach (var article in _articles)
+        {
+            <option value="@article.Id">@article.Name - @article.Price</option>
+        }
+    </InputSelect>
+    <label>
+        Antal:
+        <InputNumber @bind-Value="orderRow.Quantity" />
+    </label>
+    <button class="btn btn-primary" @onclick="AddOrderRow">Lägg till orderrad</button>
+    <ul>
+        @foreach (var row in order.OrderRows)
+        {
+            <li>@row.Article.Name - @row.Quantity - @row.Sum</li>
+        }
+    </ul>
+</EditForm>
+@if (valid)
+{
+    <button class="btn btn-secondary" @onclick="CreateOrder">Skapa order</button>
+}
+@code {
+    Order order = new();
+    OrderRow orderRow = new();
+    int chosenArticleId;
+    List<Article> _articles = new();
+    bool valid = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _articles = service.Articles;
+    }
+
+    void AddOrderRow()
+    {
+        order.OrderRows.Add(new OrderRow
+            {
+                RowNumber = order.OrderRows.Count + 1,
+                Article = ArticleFactory.CreateArticle(chosenArticleId),
+                Quantity = orderRow.Quantity
+            });
+    }
+    void CreateOrder()
+    {
+        order.Id = service.Orders.Count + 1;
+        service.Orders.Add(order);
+    }
+}
