@@ -1,0 +1,32 @@
+﻿@inject HomeService service;
+@page "/ArticleCreation";
+@inject NavigationManager nav;
+@using System.ComponentModel.DataAnnotations;
+
+<h3>Skapa ny artikel</h3>
+<EditForm Model="@article"></EditForm>
+<p>Artikelnamn</p>
+<InputText id="Name" class="form-control" placeholder="Namn på artikel" @bind-Value="Name" />
+<p>Beskrivning (frivilligt)</p>
+<InputTextArea id="Description" class="form-control" placeholder="..." @bind-Value="Description" />
+<p>Styckpris</p>
+<InputNumber id="Price" class="form-control" placeholder="123456789" @bind-Value="Price" min="0,1" max="99999999" />
+
+<button class="btn btn-primary" @onclick="CreateArticle">Lägg till ny artikel</button>
+@code {
+    Article? article;
+    [Required]
+    [MinLength(2, ErrorMessage = "Namn måste ha mer än två bokstäver"), MaxLength(30, ErrorMessage = "Namnet får inte ha fler än 30 bokstäver")]
+    public string Name { get; set; } = string.Empty;
+
+    public string? Description { get; set; } = null;
+    [Required]
+    [Range(0.1, 999999, ErrorMessage = "Pris måste vara mer än 0.1 och 999999")]
+    public decimal Price { get; set; } = 0;
+
+    void CreateArticle()
+    {
+        ArticleFactory.AddArticleTemplate(Name, Description, Price);
+        nav.NavigateTo("/Index");
+    }
+}

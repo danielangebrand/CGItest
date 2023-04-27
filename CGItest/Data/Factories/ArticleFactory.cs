@@ -1,5 +1,5 @@
-﻿using CGItest.Models;
-using System.Reflection.Metadata.Ecma335;
+﻿
+using CGItest.Models;
 
 namespace CGItest.Data.Factories
 {
@@ -15,14 +15,14 @@ namespace CGItest.Data.Factories
 
         public static Article? CreateArticle(int id)
         {
+
             var article = Articles.FirstOrDefault(a => a.Id == id);
             return article.Clone();
         }
-        public static Article AddArticleTemplate(string name, string? description, decimal price)
+    public static void AddArticleTemplate(string name, string? description, decimal price)
         {
             var a = new Article(Articles.Count + 1, name, description, price);
             Articles.Add(a);
-            return a;
         }
     }
 }

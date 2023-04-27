@@ -1,4 +1,6 @@
-﻿namespace CGItest.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CGItest.Models
 {
     public class Order
     {

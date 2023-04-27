@@ -1,5 +1,95 @@
-﻿<h3>Search</h3>
+﻿@inject HomeService service;
+@page "/Search";
+
+<h2>Sök ordrar via artiklar</h2>
+@if (chosenArticleId != 0)
+{
+    <h3>@service.GetArticleById(chosenArticleId).Name</h3>
+}
+<form @onsubmit="DisplayOrders">
+    <InputSelect @bind-Value="@chosenArticleId"
+                 DisplayName="chosen article"
+                @onselectionchange="Reset">
+        <option value="0">Välj en artikel..</option>
+        @foreach (var article in service.Articles)
+        {
+            <option value="@article.Id">@article.Name - @article.Price</option>
+        }
+    </InputSelect>
+   @if (chosenArticleId == 0)
+    {
+        <button class="btn btn-secondary" disabled>Välj</button>
+    }
+    else
+    {
+        <button type="submit" class="btn btn-primary">Välj</button>
+    }
+</form>
+<table>
+    <thead>
+        <tr>
+            <th>Ordernummer</th>
+            <th>Namn</th>
+            <th>Orderrad</th>
+            <th>Styckpris</th>
+            <th>Antal</th>
+            <th>Summa</th>
+        </tr>
+    </thead>
+    @if (chosenArticleId != 0)
+    {
+
+        @foreach (var order in Orders)
+        {
+            @foreach (var row in order.OrderRows.Where(or => or.Article.Id == chosenArticleId))
+            {
+                <tr>
+                    <td> @order.Id </td>
+                    <td> @order.Name </td>
+                    <td> @row.RowNumber </td>
+                    <td> @row.Article.Price </td>
+                    <td> @row.Quantity </td>
+                    <td> @row.Sum </td>
+                </tr>
+            }
+        }
+    }
+    <thead>
+        <tr>
+            <th>Rader hittade</th>
+            <th>Summan av dessa</th>
+        </tr>
+    </thead>
+    <tr>
+        @if (chosenArticleId != 0)
+        {
+            <td>@rowsFound</td>
+            <td>@SumOfOrders</td>
+        }
+    </tr>
+</table>
 
 @code {
+    int chosenArticleId = 0;
+    List<Order> Orders = new();
+    decimal SumOfOrders;
+    int rowsFound;
 
+    void DisplayOrders()
+    {
+        if (chosenArticleId != 0)
+        {
+            Orders = service.GetOrdersByArticleId(chosenArticleId);
+            rowsFound = Orders.SelectMany(o => o.OrderRows).Where(or => or.Article.Id == chosenArticleId).Count();
+            SumOfOrders = Orders.SelectMany(o => o.OrderRows).Where(or => or.Article.Id == chosenArticleId).Sum(or => (decimal)or.Sum);
+        }
+        else throw new IndexOutOfRangeException(nameof(chosenArticleId));
+    }
+    void Reset()
+    {
+        Orders = new();
+        chosenArticleId = 0;
+        SumOfOrders = 0;
+        rowsFound = 0;
+    }
 }

@@ -2,16 +2,20 @@
 @using CGItest.Models;
 @using CGItest.Services;
 @using Microsoft.AspNetCore.Components.Forms;
+@using System.ComponentModel.DataAnnotations;
 @page "/OrderCreation";
 @inject HomeService service;
+@inject NavigationManager nav;
 
 <h3>Skapa din order</h3>
 
-<EditForm Model="@order" OnValidSubmit="CreateOrder">
+<EditForm Model="@order">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
     <p>
         <label>
             Ange ditt namn:
-            <InputText id="Name" class="form-control" @bind-Value="order.Name" />
+            <InputText id="Name" class="form-control" @bind-Value="Name" placeholder="Ange ett namn" />
         </label>
     </p>
     <thead>
@@ -21,18 +25,25 @@
         </tr>
     </thead>
 
-    <InputSelect @bind-Value="@chosenArticleId">
-        <option value="">Välj en artikel..</option>
-        @foreach (var article in _articles)
+    <InputSelect @bind-Value="@chosenArticleId"
+                 DisplayName="chosen article">
+        <option value="0" placeholder="Välj en artikel">Välj en artikel</option>
+        @foreach (var article in service.Articles)
         {
             <option value="@article.Id">@article.Name - @article.Price</option>
         }
     </InputSelect>
     <label>
-        Antal:
-        <InputNumber @bind-Value="orderRow.Quantity" />
+        <InputNumber @bind-Value="ArticleQuantity" min="1" max="10000" placeholder="1-10000"/>
     </label>
-    <button class="btn btn-primary" @onclick="AddOrderRow">Lägg till orderrad</button>
+    @if (ArticleQuantity == 0)
+    {
+        <button class="btn btn-primary" disabled>Lägg till orderrad (Måste innehålla minst en artikel)</button>
+    }
+    else
+    {
+        <button class="btn btn-primary" @onclick="AddOrderRow">Lägg till orderrad</button>
+    }
     <ul>
         @foreach (var row in order.OrderRows)
         {
@@ -40,21 +51,26 @@
         }
     </ul>
 </EditForm>
-@if (valid)
+@if (order.OrderRows.Count == 0)
+{
+    <button class="btn btn-secondary" disabled>Skapa order (måste innehålla minst en orderrad)</button>
+}
+else
 {
     <button class="btn btn-secondary" @onclick="CreateOrder">Skapa order</button>
 }
 @code {
     Order order = new();
-    OrderRow orderRow = new();
+    //OrderRow orderRow = new();
     int chosenArticleId;
-    List<Article> _articles = new();
-    bool valid = false;
 
-    protected override async Task OnInitializedAsync()
-    {
-        _articles = service.Articles;
-    }
+    [Required]
+    [MinLength(2, ErrorMessage = "Namn måste ha mer än två bokstäver"), MaxLength(30, ErrorMessage = "Namnet får inte ha fler än 30 bokstäver")]
+    string Name { get; set; } = string.Empty;
+
+    [Required]
+    [Range(1, 999999, ErrorMessage = "Antal måste vara mellan 1 och 999999")]
+    int ArticleQuantity { get; set; } = 0;
 
     void AddOrderRow()
     {
@@ -62,12 +78,17 @@
             {
                 RowNumber = order.OrderRows.Count + 1,
                 Article = ArticleFactory.CreateArticle(chosenArticleId),
-                Quantity = orderRow.Quantity
+                Quantity = ArticleQuantity
             });
     }
     void CreateOrder()
     {
-        order.Id = service.Orders.Count + 1;
-        service.Orders.Add(order);
+        if (order.OrderRows.Count > 0 && ArticleQuantity > 0)
+        {
+            order.Id = service.Orders.Count + 1;
+            order.Name = Name;
+            service.Orders.Add(order);
+            nav.NavigateTo("/Index");
+        }
     }
 }

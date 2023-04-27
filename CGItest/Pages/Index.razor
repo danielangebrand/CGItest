@@ -1,4 +1,6 @@
 ﻿@page "/Index"
+@page "/"
+@page "/Home"
 @inject HomeService service;
 
 
@@ -10,6 +12,7 @@
 <h4>
     Ordrar
 </h4>
+<table>
 @foreach (var order in _orders)
 {
 <thead>
@@ -18,30 +21,36 @@
         <th>Namn</th>
     </tr>
 </thead>
-    <ul>
-        @order.Id
-        @order.Name
-    </ul>
+<tbody>
+
+    <tr>
+        <td>@order.Id</td>
+        <td>@order.Name</td>
+    </tr>
+</tbody>
     <thead>
         <tr>
-            <th>#</th>
+            <th>Orderrad</th>
             <th>Artikelnamn</th>
             <th>Styckpris</th>
             <th>Kvantitet</th>
             <th>Summa</th>
         </tr>
     </thead>
-    foreach (var row in order.OrderRows)
+    <tbody>
+    @foreach (var row in order.OrderRows)
     {
-        <ul>
-            #@row.RowNumber
-            @row.Article.Name
-            @row.Article.Price
-            @row.Quantity
-            @row.Sum
-        </ul>
+        <tr>
+            <td>@row.RowNumber</td>
+            <td>@row.Article.Name</td>
+            <td>@row.Article.Price</td>
+            <td>@row.Quantity</td>
+            <td>@row.Sum</td>
+        </tr>
     }
+    </tbody>
 }
+</table>
 @code
 {
     List<Order> _orders = new();

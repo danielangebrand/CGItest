@@ -29,7 +29,7 @@ namespace CGItest.Services
         public List<Order> GetOrders() => Orders;
         public static List<Article> GetArticles() => ArticleFactory.Articles;
         public Article GetArticleById(int id) => Articles.FirstOrDefault(a => a.Id == id);
-        public List<OrderRow> GetOrderRowsByArticleId(int id) => Orders.SelectMany(o => o.OrderRows.Where(l => l.Article.Id == id)).ToList();
+        public List<Order> GetOrdersByArticleId(int id) => Orders.Where(o => o.OrderRows.Any(or => or.Article.Id == id)).ToList();
     }
 }
 
