@@ -1,13 +1,13 @@
-﻿using CGItest.Data.Factories;
+﻿using CGItest.Factories;
 using CGItest.Models;
 
 namespace CGItest.Services
 {
-    public class HomeService
+    public class DataService
     {
         public List<Order> Orders = new();
         public List<Article> Articles = new();
-        public HomeService()
+        public DataService()
         {
             Articles = GetArticles();
             var order1 = new Order { Id = 1, Name = "Ben Dover" };

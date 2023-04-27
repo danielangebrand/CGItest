@@ -16,7 +16,7 @@ namespace CGItest.Models
             Price = price;
             Id = id;
         }
-
+        // Template enbart..
         public Article()
         {
             

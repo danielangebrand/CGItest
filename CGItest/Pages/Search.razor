@@ -1,95 +1,93 @@
-﻿@inject HomeService service;
+﻿@inject DataService service;
 @page "/Search";
 
 <h2>Sök ordrar via artiklar</h2>
-@if (chosenArticleId != 0)
-{
-    <h3>@service.GetArticleById(chosenArticleId).Name</h3>
-}
-<form @onsubmit="DisplayOrders">
+
+<form>
     <InputSelect @bind-Value="@chosenArticleId"
                  DisplayName="chosen article"
-                @onselectionchange="Reset">
+                 @onclick="Reset">
         <option value="0">Välj en artikel..</option>
         @foreach (var article in service.Articles)
         {
             <option value="@article.Id">@article.Name - @article.Price</option>
         }
     </InputSelect>
-   @if (chosenArticleId == 0)
+    @if (chosenArticleId == 0)
     {
         <button class="btn btn-secondary" disabled>Välj</button>
     }
     else
     {
-        <button type="submit" class="btn btn-primary">Välj</button>
+        <button type="button" class="btn btn-primary" @onclick="DisplayOrders">Välj</button>
     }
 </form>
-<table>
-    <thead>
-        <tr>
-            <th>Ordernummer</th>
-            <th>Namn</th>
-            <th>Orderrad</th>
-            <th>Styckpris</th>
-            <th>Antal</th>
-            <th>Summa</th>
-        </tr>
-    </thead>
-    @if (chosenArticleId != 0)
-    {
-
-        @foreach (var order in Orders)
-        {
-            @foreach (var row in order.OrderRows.Where(or => or.Article.Id == chosenArticleId))
-            {
-                <tr>
-                    <td> @order.Id </td>
-                    <td> @order.Name </td>
-                    <td> @row.RowNumber </td>
-                    <td> @row.Article.Price </td>
-                    <td> @row.Quantity </td>
-                    <td> @row.Sum </td>
-                </tr>
-            }
-        }
-    }
-    <thead>
-        <tr>
-            <th>Rader hittade</th>
-            <th>Summan av dessa</th>
-        </tr>
-    </thead>
-    <tr>
+@if (clicked)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Ordernummer</th>
+                <th>Namn</th>
+                <th>Orderrad</th>
+                <th>Styckpris</th>
+                <th>Antal</th>
+                <th>Summa</th>
+            </tr>
+        </thead>
         @if (chosenArticleId != 0)
         {
-            <td>@rowsFound</td>
-            <td>@SumOfOrders</td>
+            @foreach (var order in orders)
+            {
+                @foreach (var row in order.OrderRows.Where(or => or.Article.Id == chosenArticleId))
+                {
+                    <tr>
+                        <td> @order.Id </td>
+                        <td> @order.Name </td>
+                        <td> @row.RowNumber </td>
+                        <td> @row.Article.Price </td>
+                        <td> @row.Quantity </td>
+                        <td> @row.Sum </td>
+                    </tr>
+                }
+            }
         }
-    </tr>
-</table>
+        <thead>
+            <tr>
+                <th>Rader hittade</th>
+                <th>Summan av dessa</th>
+            </tr>
+        </thead>
+        <tr>
+            @if (chosenArticleId != 0)
+            {
+                <td>@rowsFound</td>
+                <td>@sumOfOrders</td>
+            }
+        </tr>
+    </table>
+}
 
 @code {
     int chosenArticleId = 0;
-    List<Order> Orders = new();
-    decimal SumOfOrders;
+    List<Order> orders = new();
+    decimal sumOfOrders;
     int rowsFound;
+    bool clicked = false;
 
     void DisplayOrders()
     {
         if (chosenArticleId != 0)
         {
-            Orders = service.GetOrdersByArticleId(chosenArticleId);
-            rowsFound = Orders.SelectMany(o => o.OrderRows).Where(or => or.Article.Id == chosenArticleId).Count();
-            SumOfOrders = Orders.SelectMany(o => o.OrderRows).Where(or => or.Article.Id == chosenArticleId).Sum(or => (decimal)or.Sum);
+            orders = service.GetOrdersByArticleId(chosenArticleId);
+            rowsFound = orders.SelectMany(o => o.OrderRows).Where(or => or.Article.Id == chosenArticleId).Count();
+            sumOfOrders = orders.SelectMany(o => o.OrderRows).Where(or => or.Article.Id == chosenArticleId).Sum(or => (decimal)or.Sum);
+            clicked = true;
         }
         else throw new IndexOutOfRangeException(nameof(chosenArticleId));
     }
     void Reset()
     {
-        Orders = new();
-        chosenArticleId = 0;
-        SumOfOrders = 0;
-        rowsFound = 0;
+        clicked = false;
     }
 }

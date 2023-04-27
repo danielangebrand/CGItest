@@ -1,10 +1,9 @@
-﻿@using CGItest.Data.Factories;
-@using CGItest.Models;
-@using CGItest.Services;
+﻿@using CGItest.Shared;
 @using Microsoft.AspNetCore.Components.Forms;
 @using System.ComponentModel.DataAnnotations;
+@using CGItest.Factories;
 @page "/OrderCreation";
-@inject HomeService service;
+@inject DataService service;
 @inject NavigationManager nav;
 
 <h3>Skapa din order</h3>
@@ -36,7 +35,7 @@
     <label>
         <InputNumber @bind-Value="ArticleQuantity" min="1" max="10000" placeholder="1-10000"/>
     </label>
-    @if (ArticleQuantity == 0)
+    @if (ArticleQuantity == 0 || chosenArticleId == 0)
     {
         <button class="btn btn-primary" disabled>Lägg till orderrad (Måste innehålla minst en artikel)</button>
     }
@@ -61,15 +60,10 @@ else
 }
 @code {
     Order order = new();
-    //OrderRow orderRow = new();
     int chosenArticleId;
 
-    [Required]
-    [MinLength(2, ErrorMessage = "Namn måste ha mer än två bokstäver"), MaxLength(30, ErrorMessage = "Namnet får inte ha fler än 30 bokstäver")]
     string Name { get; set; } = string.Empty;
 
-    [Required]
-    [Range(1, 999999, ErrorMessage = "Antal måste vara mellan 1 och 999999")]
     int ArticleQuantity { get; set; } = 0;
 
     void AddOrderRow()

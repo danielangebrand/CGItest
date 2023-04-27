@@ -1,7 +1,7 @@
 ﻿
 using CGItest.Models;
 
-namespace CGItest.Data.Factories
+namespace CGItest.Factories
 {
     internal static class ArticleFactory
     {
@@ -15,7 +15,6 @@ namespace CGItest.Data.Factories
 
         public static Article? CreateArticle(int id)
         {
-
             var article = Articles.FirstOrDefault(a => a.Id == id);
             return article.Clone();
         }

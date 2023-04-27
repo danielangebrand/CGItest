@@ -1,7 +1,7 @@
 ﻿@page "/Index"
 @page "/"
 @page "/Home"
-@inject HomeService service;
+@inject DataService service;
 
 
 <PageTitle>Index</PageTitle>
@@ -13,7 +13,7 @@
     Ordrar
 </h4>
 <table>
-@foreach (var order in _orders)
+@foreach (var order in service.GetOrders())
 {
 <thead>
     <tr>
@@ -53,9 +53,5 @@
 </table>
 @code
 {
-    List<Order> _orders = new();
-    protected override async Task OnInitializedAsync()
-    {
-        _orders = service.GetOrders();
-    }
+  
 }
