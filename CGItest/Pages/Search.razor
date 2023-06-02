@@ -86,8 +86,6 @@
         }
         else throw new IndexOutOfRangeException(nameof(chosenArticleId));
     }
-    void Reset()
-    {
-        clicked = false;
-    }
+    void Reset() => clicked = false;
+    
 }

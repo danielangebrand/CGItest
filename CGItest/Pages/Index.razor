@@ -5,53 +5,50 @@
 
 
 <PageTitle>Index</PageTitle>
-@if (service == null)
-{
-    <p>DEN ÄR NULL TAMEFAN!</p>
-}
 <h4>
     Ordrar
 </h4>
-<table>
 @foreach (var order in service.GetOrders())
 {
-<thead>
-    <tr>
-        <th>Id</th>
-        <th>Namn</th>
-    </tr>
-</thead>
-<tbody>
-
-    <tr>
-        <td>@order.Id</td>
-        <td>@order.Name</td>
-    </tr>
-</tbody>
-    <thead>
-        <tr>
-            <th>Orderrad</th>
-            <th>Artikelnamn</th>
-            <th>Styckpris</th>
-            <th>Kvantitet</th>
-            <th>Summa</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var row in order.OrderRows)
-    {
-        <tr>
-            <td>@row.RowNumber</td>
-            <td>@row.Article.Name</td>
-            <td>@row.Article.Price</td>
-            <td>@row.Quantity</td>
-            <td>@row.Sum</td>
-        </tr>
-    }
-    </tbody>
+    <div class="order-container" style="margin-bottom: 20px; border: 1px solid #ccc; padding: 10px;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Namn</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.Name</td>
+                </tr>
+            </tbody>
+            <thead>
+                <tr>
+                    <th>Orderrad</th>
+                    <th>Artikelnamn</th>
+                    <th>Styckpris</th>
+                    <th>Kvantitet</th>
+                    <th>Summa</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in order.OrderRows)
+                {
+                    <tr>
+                        <td>@row.RowNumber</td>
+                        <td>@row.Article.Name</td>
+                        <td>@row.Article.Price</td>
+                        <td>@row.Quantity</td>
+                        <td>@row.Sum</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
-</table>
 @code
 {
-  
+
 }

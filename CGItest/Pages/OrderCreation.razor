@@ -7,14 +7,13 @@
 @inject NavigationManager nav;
 
 <h3>Skapa din order</h3>
-
 <EditForm Model="@order">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    @*<DataAnnotationsValidator />*@
+    @*<ValidationSummary />*@
     <p>
         <label>
             Ange ditt namn:
-            <InputText id="Name" class="form-control" @bind-Value="Name" placeholder="Ange ett namn" />
+            <InputText id="Name" class="form-control" @bind-Value="order.Name" placeholder="Ange ett namn" />
         </label>
     </p>
     <thead>
@@ -23,25 +22,24 @@
             <th>Kvantiet</th>
         </tr>
     </thead>
-
     <InputSelect @bind-Value="@chosenArticleId"
                  DisplayName="chosen article">
-        <option value="0" placeholder="Välj en artikel">Välj en artikel</option>
+        <option value="0" placeholder="Välj en artikel">Välj artikel</option>
         @foreach (var article in service.Articles)
         {
             <option value="@article.Id">@article.Name - @article.Price</option>
         }
     </InputSelect>
     <label>
-        <InputNumber @bind-Value="ArticleQuantity" min="1" max="10000" placeholder="1-10000"/>
+        <InputNumber @bind-Value="ArticleQuantity" min="1" max="10000" placeholder="1-10000" />
     </label>
-    @if (ArticleQuantity == 0 || chosenArticleId == 0)
+    @if (ArticleQuantity > 0 && chosenArticleId > 0)
     {
-        <button class="btn btn-primary" disabled>Lägg till orderrad (Måste innehålla minst en artikel)</button>
+        <button class="btn btn-primary" @onclick="AddOrderRow">Lägg till orderrad</button>
     }
     else
     {
-        <button class="btn btn-primary" @onclick="AddOrderRow">Lägg till orderrad</button>
+        <button class="btn btn-primary" disabled>Lägg till orderrad</button>
     }
     <ul>
         @foreach (var row in order.OrderRows)
@@ -49,39 +47,26 @@
             <li>@row.Article.Name - @row.Quantity - @row.Sum</li>
         }
     </ul>
+    @if (order.OrderRows.Count == 0)
+    {
+        <btn class="btn btn-secondary" @disabled>Namn & Orderrader krävs</btn>
+    }
+    else
+    {
+        <button class="btn btn-secondary" @onclick="CreateOrder">Skapa order</button>
+    }
 </EditForm>
-@if (order.OrderRows.Count == 0)
-{
-    <button class="btn btn-secondary" disabled>Skapa order (måste innehålla minst en orderrad)</button>
-}
-else
-{
-    <button class="btn btn-secondary" @onclick="CreateOrder">Skapa order</button>
-}
 @code {
     Order order = new();
-    int chosenArticleId;
-
-    string Name { get; set; } = string.Empty;
-
+    int chosenArticleId = 0;
     int ArticleQuantity { get; set; } = 0;
 
-    void AddOrderRow()
-    {
-        order.OrderRows.Add(new OrderRow
-            {
-                RowNumber = order.OrderRows.Count + 1,
-                Article = ArticleFactory.CreateArticle(chosenArticleId),
-                Quantity = ArticleQuantity
-            });
-    }
+    void AddOrderRow() => service.CreateOrderRow(order, chosenArticleId, ArticleQuantity);
     void CreateOrder()
     {
-        if (order.OrderRows.Count > 0 && ArticleQuantity > 0)
+        if (order.OrderRows.Count > 0 && order.Name.Length > 1 && order.Name.Length < 31)
         {
-            order.Id = service.Orders.Count + 1;
-            order.Name = Name;
-            service.Orders.Add(order);
+            service.CreateOrder(order);
             nav.NavigateTo("/Index");
         }
     }

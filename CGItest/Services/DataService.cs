@@ -1,5 +1,6 @@
 ﻿using CGItest.Factories;
 using CGItest.Models;
+using System.Xml.Linq;
 
 namespace CGItest.Services
 {
@@ -30,6 +31,24 @@ namespace CGItest.Services
         public static List<Article> GetArticles() => ArticleFactory.Articles;
         public Article GetArticleById(int id) => Articles.FirstOrDefault(a => a.Id == id);
         public List<Order> GetOrdersByArticleId(int id) => Orders.Where(o => o.OrderRows.Any(or => or.Article.Id == id)).ToList();
+
+        public void CreateArticle(string name, string? descr, decimal price) => ArticleFactory.AddArticleTemplate(name, descr, price);
+
+        public void CreateOrderRow(Order order, int chosenArticleId, int quantity)
+        {
+            order.OrderRows.Add(new OrderRow
+            {
+                RowNumber = order.OrderRows.Count + 1,
+                Article = ArticleFactory.CreateArticle(chosenArticleId),
+                Quantity = quantity
+            });
+        }
+        public void CreateOrder(Order order)
+        {
+                order.Id = Orders.Count + 1;
+                Orders.Add(order);
+        }
+
     }
 }
 

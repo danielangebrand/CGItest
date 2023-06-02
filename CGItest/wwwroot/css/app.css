@@ -99,3 +99,10 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+
+.order-container {
+    margin-bottom: 20px; /* Adjust the margin-bottom value to control the separation between orders */
+    border: 1px solid #ccc; /* Optional: Add a border around each order container */
+    padding: 10px; /* Optional: Add padding to the order container */
+}
+
